@@ -1,0 +1,14 @@
+110 $FD
+12F $9B
+
+$100)  	LDS R2, 110
+		LDS R3, 12F
+		ADD R3, R2
+		EOR R2, R3
+		MUL R2, R3
+		ROL R1
+		ICALL
+		SBC R2, R1
+
+L0: 15F)	SWAP R1
+			RET

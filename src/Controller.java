@@ -32,6 +32,7 @@ public class Controller {
     int STACK;
     int SP = 0x25F;
 
+    byte SREG;
     boolean I, T, H, S, V, N, Z, C;
     String lastCommand;
 
@@ -44,8 +45,12 @@ public class Controller {
     private final Subprogram subprogram;
     private final Backup backup = new Backup();
 
+    public static void main(String[] args) {
+
+    }
 
     Controller(String memory, String program, String subprogram) {
+        System.out.println("memory: " + memory + "\n\nprogram: " + program + "\n\nsubprogram: " + subprogram);
         loadMemory(memory);
         this.program = program.replace("$100)", "");
         this.subprogram = new Subprogram(subprogram);
@@ -55,7 +60,35 @@ public class Controller {
         exec(program);
     }
 
-    public static void main(String[] args) {
+    void setStatus(char flag, boolean value) {
+        int mask = switch (flag) {
+            case 'I' -> 128;
+            case 'T' -> 64;
+            case 'H' -> 32;
+            case 'S' -> 16;
+            case 'V' -> 8;
+            case 'N' -> 4;
+            case 'Z' -> 2;
+            case 'C' -> 1;
+            default -> throw new Error("No such flag");
+        };
+        if (value) SREG |= mask;
+        else SREG &= ~mask;
+    }
+
+    boolean getStatus(char flag) {
+        int mask = switch (flag) {
+            case 'I' -> 128;
+            case 'T' -> 64;
+            case 'H' -> 32;
+            case 'S' -> 16;
+            case 'V' -> 8;
+            case 'N' -> 4;
+            case 'Z' -> 2;
+            case 'C' -> 1;
+            default -> throw new Error("No such flag");
+        };
+        return (SREG & mask) != 0;
     }
 
     private void loadMemory(String memory) {
@@ -108,6 +141,7 @@ public class Controller {
             case "RET" -> RET();
             case "OR" -> OR(parts[1].replaceAll(",", ""), parts[2].replaceAll(",", ""));
             case "EOR" -> EOR(parts[1].replaceAll(",", ""), parts[2].replaceAll(",", ""));
+            case "NEG" -> NEG(parts[1].replaceAll(",", ""));
             default -> throw new Error("Command not implemented");
         }
         System.out.println(this);
@@ -303,6 +337,7 @@ public class Controller {
             default:
                 result += getRegsInfo();
         }
+        result += getSREG();
         return result;
     }
 

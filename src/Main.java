@@ -4,13 +4,17 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) throws FileNotFoundException {
-        launch("14");
+        launch("4");
+        int r2 = 0xFD;
+        int r3 = 0x9B;
+        System.out.println(Controller.hex(r2 + r3));
     }
 
     static void launch(String name) throws FileNotFoundException {
         String task = scan(name);
         String[] parts = task.split("\n\n");
         Controller c = new Controller(parts[0], parts[1], parts[2]);
+
         c.run();
     }
 
